@@ -29,6 +29,30 @@ while (mines.length < numberOfMines) {
 
 console.log(mines);
 
+// creo una variabile userNumber in cui andrò a salvare di volta in volta il numero inserito dall'utente
+var userNumber;
+
+// creo un array userNumbers (inizialmente vuoto) in cui andrò a salvare tutti i numeri inseriti dall'utente (cioè, tutti i valori assunti di volta in volta dalla variabile userNumber)
+var userNumbers = [];
+
+// chiedo all'utente di inserire un numero compreso tra inf e sup (e lo salvo nella variabile userNumber)
+// continuo a fare questo fintanto che il numero che inserisce non è una delle mine (cioè, uno dei numeri salvati nell'array mines)
+// se inserisce un numero che corrisponde ad una mina, smetto di chiedergli di inserire un numero
+do {
+    userNumber = parseInt(prompt('Inserisci un numero compreso tra ' + inf + ' e ' + sup));
+    // controllo se il numero appena inserito dall'utente (e salvato nella variabile userNumber) non è già presente nell'array mines o nell'array userNumbers
+    // in altre parole, controllo se il numero appena inserito dall'utente:
+        // - non è una mina
+        // - non era già stato inserito dall'utente stesso in precedenza
+    if (!mines.includes(userNumber) && !userNumbers.includes(userNumber)) {
+        // salvo il numero appena inserito dall'utente nell'array userNumbers solo se non è una mina e non è già presente nell'array userNumbers
+        // in questo modo tutti i numeri contenuti nell'array userNumbers saranno sia diversi dalle mine sia diversi tra loro
+        userNumbers.push(userNumber);
+    }
+} while (!mines.includes(userNumber));
+
+console.log(userNumbers);
+
 // creo una funzione che prende come parametri un numero minimo min e un numero massimo max e ritorna un numero random compreso tra min e max (min e max inclusi)
 function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
