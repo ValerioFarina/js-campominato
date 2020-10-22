@@ -29,54 +29,57 @@ while (mines.length < numberOfMines) {
 
 console.log(mines);
 
-// creo un array userNumbers (inizialmente vuoto) in cui andrò a salvare tutti i numeri inseriti dall'utente (cioè, tutti i valori assunti di volta in volta dalla variabile userNumber)
+// creo un array userNumbers (inizialmente vuoto) in cui andrò a salvare tutti i numeri inseriti dall'utente prima di beccare una mina (o prima di raggiungere il punteggio massimo)
 var userNumbers = [];
 
 // creo una variabile sentinella per controllare se l'utente ha beccato una mina (cioè, se il numero inserito dall'utente è presente nell'array mines)
 var mineFound = false;
 
-// chiedo all'utente di inserire un numero compreso tra inf e sup (e lo salvo nella variabile userNumber)
-// continuo a fare questo fintanto che l'utente non becca una mina (cioè, fintanto che non inserisce un numero presente nell'array mines)
-// se inserisce un numero che corrisponde ad una mina, smetto di chiedergli di inserire un numero
-do {
-    var userNumber = parseInt(prompt('Inserisci un numero compreso tra ' + inf + ' e ' + sup));
-    // controllo se il numero appena inserito dall'utente (e salvato nella variabile userNumber) non è già presente nell'array mines o nell'array userNumbers
-    // in altre parole, controllo se il numero appena inserito dall'utente:
-        // - non è una mina
-        // - non era già stato inserito dall'utente stesso in precedenza
-    if (!mines.includes(userNumber) && !userNumbers.includes(userNumber)) {
-        // salvo il numero appena inserito dall'utente nell'array userNumbers solo se non è una mina e non è già presente nell'array userNumbers
-        // in questo modo tutti i numeri contenuti nell'array userNumbers saranno sia diversi dalle mine sia diversi tra loro
-        userNumbers.push(userNumber);
-    } else if (userNumbers.includes(userNumber)) {
-        // se il numero inserito dall'utente è già presente nell'array userNumbers, significa che:
-            // - non è una mina (perché tutti i numeri salvati in tale array sono diversi dalle mine)
-            // - l'utente questo numero lo aveva già inserito in precedenza, e quindi lo avviso con un messaggio
-        alert('Hai già inserito questo numero');
-    } else {
-        // se il numero inserito dall'utente è una mina (cioè, è incluso nell'array mines), cambio il valore della variabile mineFound da false a true
-        // una volta che la variabile mineFound ha valore true, la condizione di permanenza nel ciclo cessa di essere verificata
-        mineFound = true;
-    }
-} while (!mineFound);
-
-// alla fine l'array userNumbers contiene tutti i numeri che l'utente ha inserito, salvo l'ultimo numero che l'utente ha inserito
-// l'ultimo numero inserito dall'utente corrisponde ad una mina, ed è quello che ha determinato la fine del gioco
-console.log(userNumbers);
-
-// creo una variabile userScore che indica il punteggio totalizzato dall'utente
-// pongo questa variabile uguale alla lunghezza dell'array userNumbers, cioè uguale al numero di elementi presenti in tale array
-// infatti, l'array userNumbers contiene tutti i numeri inseriti dall'utente prima di beccare una mina
-// quindi, il numero di elementi contenuti in questo array corrisponde al punteggio totalizzato dall'utente
-var userScore = userNumbers.length;
-
 // creo una variabile maxScore che rappresenta il massimo punteggio che l'utente può realizzare
 // l'utente realizza il punteggio massimo quando inserisce uno dopo l'altro esattamente tutti quei numeri compresi tra inf e sup che non sono presenti nell'array mines
-// il punteggio massimo corrisponde quindi alla quantità di numeri compresi tra inf e sup e diversi dalle mine
-// quindi, per calcolare il punteggio massimo dobbiamo
+// il punteggio massimo corrisponde quindi alla quantità di numeri compresi tra inf e sup che diversi dalle mine
+// quindi, per calcolare il punteggio massimo dobbiamo:
     // - calcolare quanti sono i numeri compresi tra inf e sup (questo si ottiene facendo sup - inf + 1)
     // - sottrarre a tale valore il numero delle mine
 var maxScore = (sup - inf + 1) - numberOfMines;
+
+// creo una variabile userScore che indica il punteggio totalizzato dall'utente
+// pongo questa variabile uguale alla lunghezza dell'array userNumbers, cioè uguale al numero di elementi presenti in tale array
+// infatti, l'array userNumbers conterrà tutti i numeri inseriti dall'utente prima di beccare una mina (o prima di raggiungere il punteggio massimo)
+// quindi, il numero di elementi contenuti in questo array corrisponde al punteggio totalizzato dall'utente
+var userScore = userNumbers.length;
+
+// chiedo all'utente di inserire un numero compreso tra inf e sup (e lo salvo nella variabile userNumber)
+// continuo a fare questo fintanto che entrambe le seguenti condizioni sono verificate:
+    // - mineFound ha valore false, e quindi l'utente non ha beccato una mina (cioè, non ha inserito un numero presente nell'array mines)
+    // - il punteggio totalizzato dall'utente non ha raggiunto il valore massimo
+do {
+    // tuttavia, prima di controllare se l'utente ha beccato una mina, controllo se l'input dell'utente è corretto
+    // in altre parole, controllo se l'input dell'utente è un numero compreso tra inf e sup
+    do {
+        var userNumber = parseInt(prompt('Inserisci un numero compreso tra ' + inf + ' e ' + sup));
+        if (isNaN(userNumber) || userNumber < inf || userNumber > sup) {
+            alert('Per favore, inserire un numero compreso tra ' + inf + ' e ' + sup);
+        }
+    } while (isNaN(userNumber) || userNumber < inf || userNumber > sup)
+    // controllo se l'utente ha beccato una mina (cioè, se il numero che ha appena inserito è incluso nell'array mines)
+    if (mines.includes(userNumber)) {
+        // se l'utente ha beccato una mina, pongo mineFound uguale a true (questo rende la condizione di permanenza nel ciclo falsa)
+        mineFound = true;
+        console.log('Hai beccato la mina ' + userNumber);
+    // controllo se il numero inserito dall'utente è già presente nell'array userNumbers
+    } else if (userNumbers.includes(userNumber)) {
+        // ciò significa che l'utente questo numero lo aveva già inserito in precedenza, e quindi lo avviso con un messaggio
+        alert('Hai già inserito questo numero');
+    } else {
+        // se il numero inserito dall'utente non è una mina, e inoltre non è incluso nell'array userNumbers, allora lo salvo in questo array
+        // inoltre, aggiorno il punteggio dell'utente (che deve sempre essere uguale alla lunghezza dell'array userNumbers)
+        userNumbers.push(userNumber);
+        userScore = userNumbers.length;
+    }
+} while (!mineFound && userScore < maxScore);
+
+console.log(userNumbers);
 
 // controllo se l'utente ha realizzato il punteggio massimo
 // se ha realizzato il punteggio massimo, ha vinto
