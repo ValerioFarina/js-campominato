@@ -10,21 +10,22 @@
 
 
 
-// creo una variabile contenente come valore il numero delle mine che desideriamo generare
-var numberOfMines = 16;
+// creo delle variabili che rappresentano il livello minimo e il livello massimo di difficoltà che l'utente può scegliere
+var minLevel = 0;
+var maxLevel = 2;
 
 // chiedo all'utente di inserire il livello di difficoltà
-// continuo a chiderglielo fintanto che l'input da lui inserito non è corretto
-// in questo caso, l'input dell'utente non è corretto quando si verifica almeno una delle seguenti condizioni:
+// continuo a chiderglielo fintanto che l'input da lui inserito non è valido
+// in questo caso, l'input dell'utente non è valido quando si verifica almeno una delle seguenti condizioni:
     // - l'input inserito non è un numero
-    // - l'input inserito è un numero, ma non è nè 0, nè 1, nè 2 (cioè, è < 0 oppure > 2)
+    // - l'input inserito è un numero, ma non è compreso tra minLevel e maxLevel
 var level;
 do {
-    level = parseInt(prompt('Scegli un livello di difficoltà tra 0, 1 e 2'));
-    if (isNaN(level) || level < 0 || level > 2) {
-        alert('Per favore, inserisci 0, 1 oppure 2');
+    level = parseInt(prompt('Scegli un livello di difficoltà compreso tra ' + minLevel + ' e ' + maxLevel));
+    if (! isInputValid(level, minLevel, maxLevel)) {
+        alert('Per favore, inserisci un numero compreso tra ' + minLevel + ' e ' + maxLevel);
     }
-} while(isNaN(level) || level < 0 || level > 2);
+} while (! isInputValid(level, minLevel, maxLevel));
 
 // creo due variabili inf e sup (estremo inferiore ed estremo superiore)
 // sia le mine sia i numeri inseriti dall'utente dovranno essere compresi tra inf e sup
@@ -34,28 +35,25 @@ var sup;
 // controllo quale livello ha inserito l'utente
 // a seconda del livello, stabilisco quale valore assegnare a sup
 // il valore di inf rimane invece sempre uguale a 1
-if (level == 0) {
-    sup = 100;
-} else if (level == 1) {
-    sup = 80;
-} else if (level == 2) {
-    sup = 50;
+switch (level) {
+    case 0:
+        sup = 100;
+        break;
+    case 1:
+        sup = 80;
+        break;
+    case 2:
+        sup = 50;
+        break;
 }
 
-// creo un array (vuoto) in cui andrò a salvare le mine generate
-var mines = [];
+// creo una variabile contenente come valore il numero delle mine che desideriamo generare
+var numberOfMines = 16;
 
-// finché il numero di mine salvate in mines (cioè, la lunghezza dell'array mines) è inferiore al numero desiderato (cioè, inferiore a numberOfMines), continuo a generare nuove mine
-while (mines.length < numberOfMines) {
-    // genero un numero random compreso tra inf e sup e lo salvo in un variabile (questo numero rappresenta una mina)
-    var mine = getRndInteger(inf, sup);
-    // controllo se la mina generata casualmente è già presente nell'array mines
-    if (!mines.includes(mine)) {
-        // salvo dentro l'array mines la mina generata casualmente solo se essa non è già presente nell'array
-        // in questo modo i numeri nell'array mines saranno tutti diversi tra loro
-        mines.push(mine);
-    }
-}
+// creo un array mines contenente numeri interi casuali compresi tra inf e sup
+// questi numeri rappresentano le mine
+// il numero di elementi dell'array (cioè, il numero di mine) è pari a numberOfMines
+var mines = getArrayOfIntegers(numberOfMines, inf, sup);
 
 console.log(mines);
 
@@ -69,9 +67,9 @@ var mineFound = false;
 // l'utente realizza il punteggio massimo quando inserisce uno dopo l'altro esattamente tutti quei numeri compresi tra inf e sup che non sono presenti nell'array mines
 // il punteggio massimo corrisponde quindi alla quantità di numeri compresi tra inf e sup e che sono diversi dalle mine
 // quindi, per calcolare il punteggio massimo dobbiamo:
-    // - calcolare quanti sono i numeri compresi tra inf e sup (questo si ottiene facendo sup - inf + 1)
+    // - calcolare quanti sono i numeri compresi tra inf e sup
     // - sottrarre a tale valore il numero delle mine
-var maxScore = (sup - inf + 1) - numberOfMines;
+var maxScore = rangeSize(inf, sup) - numberOfMines;
 
 // creo una variabile userScore che indica il punteggio totalizzato dall'utente
 // pongo questa variabile uguale alla lunghezza dell'array userNumbers, cioè uguale al numero di elementi presenti in tale array
@@ -87,14 +85,14 @@ do {
     var userNumber = parseInt(prompt('Inserisci un numero compreso tra ' + inf + ' e ' + sup));
     // prima di controllare se l'utente ha beccato una mina, controllo se l'input dell'utente è corretto
     // in altre parole, controllo se l'input dell'utente è un numero compreso tra inf e sup
-    if (!isNaN(userNumber) && userNumber >= inf && userNumber <= sup) {
+    if (isInputValid(userNumber, inf, sup)) {
         // controllo se l'utente ha beccato una mina (cioè, se il numero che ha appena inserito è incluso nell'array mines)
         if (mines.includes(userNumber)) {
             // se l'utente ha beccato una mina, pongo mineFound uguale a true (questo rende la condizione di permanenza nel ciclo falsa)
             mineFound = true;
             console.log('Hai beccato la mina ' + userNumber);
             // controllo se il numero inserito dall'utente è già presente nell'array userNumbers
-        } else if (!userNumbers.includes(userNumber)) {
+        } else if (! userNumbers.includes(userNumber)) {
             // se il numero inserito dall'utente non è una mina, e inoltre non è incluso nell'array userNumbers, allora lo salvo in questo array
             // inoltre, aggiorno il punteggio dell'utente (che deve sempre essere uguale alla lunghezza dell'array userNumbers)
             userNumbers.push(userNumber);
@@ -104,10 +102,11 @@ do {
             // significa che l'utente questo numero lo aveva già inserito in precedenza, e quindi lo avviso con un messaggio
             alert('Hai già inserito questo numero');
         }
+    // se l'input inserito dall'utente non è valido, lo avviso con un messaggio
     } else {
         alert('Per favore, inserire un numero compreso tra ' + inf + ' e ' + sup);
     }
-} while (!mineFound && userScore < maxScore);
+} while (! mineFound && userScore < maxScore);
 
 console.log(userNumbers);
 
@@ -122,7 +121,74 @@ if (userScore == maxScore) {
 
 
 
-// creo una funzione che prende come parametri un numero minimo min e un numero massimo max e ritorna un numero random compreso tra min e max (min e max inclusi)
+
+
+// ********** LE MIE FUNZIONI **********
+
+// questa funzione prende in input un valore e controlla se è un numero oppure no
+// se è un numero (o comunque una stringa costituita da caratteri numerici), ritorna true
+// altrimenti, ritorna false
+function isNumber(value) {
+    if (!isNaN(value)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+// questa funzione prende in input tre numeri num, min e max, e controlla se num è compreso tra min e max
+// se num è compreso tra min e max (eventualmente uguale a min o max), allora la funzione ritorna true
+// altrimenti ritorna false
+function isInRange(num, min, max) {
+    if (num >= min && num <=max) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+// questa funzione serve a controllare se l'input inserito dall'utente è valido
+// nel nostro caso, l'input dell'utente è valido se entrambe le seguenti condizioni sono soddisfatte:
+    // - l'input è un numero
+    // - l'input è compreso tra un min e un max
+function isInputValid(input, min, max) {
+    if (isNumber(input) && isInRange(input, min, max)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// questa funzione prende in input due numeri min e max e calcola quanti sono i numeri compresi tra min e max (contando anche gli stessi min e max)
+// in altre parole, questa funzione calcola quanti numeri sono presenti nel range che va da min a max
+function rangeSize(min, max) {
+    return max - min + 1;
+}
+
+
+// questa funzione prende come parametri un numero minimo min e un numero massimo max e ritorna un numero random compreso tra min e max (min e max inclusi)
 function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
+}
+
+
+// questa funzione prende in input tre numeri: numberOfElements, min e max
+// la funzione ritorna un array contenente un numero di elementi pari a numberOfElements
+// gli elementi dell'array sono numeri interi casuali compresi tra min e max (min e max inclusi)
+// tutti gli elementi sono diversi tra loro, non ci sono duplicati
+function getArrayOfIntegers(numberOfElements, min, max) {
+    var arrayOfIntegers = [];
+    while (arrayOfIntegers.length < numberOfElements) {
+        // genero un numero random compreso tra inf e sup e lo salvo in un variabile (questo numero rappresenta una mina)
+        var randomInteger = getRndInteger(min, max);
+        // controllo se la mina generata casualmente è già presente nell'array mines
+        if (!arrayOfIntegers.includes(randomInteger)) {
+            // salvo dentro l'array mines la mina generata casualmente solo se essa non è già presente nell'array
+            // in questo modo i numeri nell'array mines saranno tutti diversi tra loro
+            arrayOfIntegers.push(randomInteger);
+        }
+    }
+    return arrayOfIntegers;
 }
