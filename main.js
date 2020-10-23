@@ -84,29 +84,28 @@ var userScore = userNumbers.length;
     // - mineFound ha valore false, e quindi l'utente non ha beccato una mina (cioè, non ha inserito un numero presente nell'array mines)
     // - il punteggio totalizzato dall'utente non ha raggiunto il valore massimo
 do {
-    var userNumber;
-    do {
-        userNumber = parseInt(prompt('Inserisci un numero compreso tra ' + inf + ' e ' + sup));
-        // prima di controllare se l'utente ha beccato una mina, controllo se l'input dell'utente è corretto
-        // in altre parole, controllo se l'input dell'utente è un numero compreso tra inf e sup
-        if (isNaN(userNumber) || userNumber < inf || userNumber > sup) {
-            alert('Per favore, inserire un numero compreso tra ' + inf + ' e ' + sup);
+    var userNumber = parseInt(prompt('Inserisci un numero compreso tra ' + inf + ' e ' + sup));
+    // prima di controllare se l'utente ha beccato una mina, controllo se l'input dell'utente è corretto
+    // in altre parole, controllo se l'input dell'utente è un numero compreso tra inf e sup
+    if (!isNaN(userNumber) && userNumber >= inf && userNumber <= sup) {
+        // controllo se l'utente ha beccato una mina (cioè, se il numero che ha appena inserito è incluso nell'array mines)
+        if (mines.includes(userNumber)) {
+            // se l'utente ha beccato una mina, pongo mineFound uguale a true (questo rende la condizione di permanenza nel ciclo falsa)
+            mineFound = true;
+            console.log('Hai beccato la mina ' + userNumber);
+            // controllo se il numero inserito dall'utente è già presente nell'array userNumbers
+        } else if (!userNumbers.includes(userNumber)) {
+            // se il numero inserito dall'utente non è una mina, e inoltre non è incluso nell'array userNumbers, allora lo salvo in questo array
+            // inoltre, aggiorno il punteggio dell'utente (che deve sempre essere uguale alla lunghezza dell'array userNumbers)
+            userNumbers.push(userNumber);
+            userScore = userNumbers.length;
+        } else {
+            // se il numero inserito dall'utente non è una mina, ma è già presente nell'array userNumbers,
+            // significa che l'utente questo numero lo aveva già inserito in precedenza, e quindi lo avviso con un messaggio
+            alert('Hai già inserito questo numero');
         }
-    } while (isNaN(userNumber) || userNumber < inf || userNumber > sup);
-    // controllo se l'utente ha beccato una mina (cioè, se il numero che ha appena inserito è incluso nell'array mines)
-    if (mines.includes(userNumber)) {
-        // se l'utente ha beccato una mina, pongo mineFound uguale a true (questo rende la condizione di permanenza nel ciclo falsa)
-        mineFound = true;
-        console.log('Hai beccato la mina ' + userNumber);
-    // controllo se il numero inserito dall'utente è già presente nell'array userNumbers
-    } else if (userNumbers.includes(userNumber)) {
-        // ciò significa che l'utente questo numero lo aveva già inserito in precedenza, e quindi lo avviso con un messaggio
-        alert('Hai già inserito questo numero');
     } else {
-        // se il numero inserito dall'utente non è una mina, e inoltre non è incluso nell'array userNumbers, allora lo salvo in questo array
-        // inoltre, aggiorno il punteggio dell'utente (che deve sempre essere uguale alla lunghezza dell'array userNumbers)
-        userNumbers.push(userNumber);
-        userScore = userNumbers.length;
+        alert('Per favore, inserire un numero compreso tra ' + inf + ' e ' + sup);
     }
 } while (!mineFound && userScore < maxScore);
 
